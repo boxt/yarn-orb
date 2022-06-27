@@ -1,0 +1,59 @@
+name: Add installation instructions for latest version
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  update-readme-with-installation-snippet:
+    name: "Update this repo's README with installation snippet using latest version"
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-ruby@v1
+      - name: "Update README"
+        run: |
+          VERSION=$(cat VERSION)
+          SNIPPET=$(cat <<-END
+
+          ## Add to your config.yml
+
+          \`\`\` yml
+          orbs:
+            rubocop: boxt/npm@$VERSION
+
+          \`\`\`
+
+          ---
+
+          END
+          )
+
+          PLACEHOLDER_START="<\!-- VERSION_SNIPPET_START -->"
+          PLACEHOLDER_END="<\!-- VERSION_SNIPPET_END -->"
+          FILENAME=README.md
+          ruby -e "
+            start_reg = Regexp.escape('$PLACEHOLDER_START'.gsub(/\\\!/, '!'))
+            end_reg   = Regexp.escape('$PLACEHOLDER_END'.gsub(/\\\!/, '!'))
+            File.open('./$FILENAME', 'r+') do |file|
+              file_content = file.read
+              regexp = /#{start_reg}(.*?)#{end_reg}/m
+              puts regexp.to_s
+              puts file_content
+              if regexp.match(file_content)
+                file_content[regexp, 1] = \"$SNIPPET\"
+                file.rewind
+                file.write(file_content)
+              else
+                puts 'No placeholder tags found'
+              end
+            end
+          "
+      - name: "Setup Git"
+        run: |
+          git config --global user.email "you@example.com"
+          git config --global user.name "boxt-github-bot"
+      - name: "Commit changes"
+        run: git commit README.md -m 'Automatically update snippet on README.md' || echo "No changes to commit"
+      - name: "Push changes"
+        run: git push origin || echo "No changes to commit"
