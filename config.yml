@@ -1,0 +1,26 @@
+version: 2.1
+
+description: Tasks for managing NPM modules in CircleCI builds
+
+display:
+  home_url: "https://github.com/boxt/orbs"
+  source_url: "https://github.com/boxt/npm-orb/blob/main/config.yml"
+
+commands:
+  cache-read:
+    steps:
+      - restore_cache:
+          keys:
+            - npm-cache-{{ arch }}-{{checksum "package-lock.json" }}
+          name: Restore NPM cache
+  cache-write:
+    steps:
+      - save_cache:
+          key: npm-cache-{{ arch }}-{{checksum "package-lock.json" }}
+          name: Save NPM cache
+          paths:
+            - ~/.cache
+            - ./node_modules
+  install:
+    steps:
+      - run: "npm i"
