@@ -20,7 +20,7 @@ jobs:
 
           \`\`\` yml
           orbs:
-            rubocop: boxt/npm@$VERSION
+            rubocop: boxt/yarn@$VERSION
 
           \`\`\`
 
