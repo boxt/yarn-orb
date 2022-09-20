@@ -10,7 +10,7 @@ You can see how this works in ./github/workflows/update-readme-workflow.yml
 
 ``` yml
 orbs:
-  rubocop: boxt/npm@0.0.0
+  rubocop: boxt/yarn@0.0.1
 
 ```
 
@@ -19,7 +19,7 @@ orbs:
 ## Read more
 
 Read about the available commands and how to use them here:
-https://circleci.com/developer/orbs/orb/boxt/npm
+https://circleci.com/developer/orbs/orb/boxt/yarn
 
 
 Part of [boxt/orbs](https://github.com/boxt/orbs)
