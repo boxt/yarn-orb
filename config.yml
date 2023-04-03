@@ -1,6 +1,6 @@
 version: 2.1
 
-description: Tasks for managing NPM modules in CircleCI builds
+description: Tasks for managing NPM modules in CircleCI builds using Yarn
 
 display:
   home_url: "https://github.com/boxt/orbs"
@@ -8,19 +8,34 @@ display:
 
 commands:
   cache-read:
+    parameters:
+      version:
+        description: Version of the cache to restore
+        type: string
+        default: "v1"
     steps:
       - restore_cache:
           keys:
-            - yarn-cache-{{ arch }}-{{checksum "yarn.lock" }}
-          name: Restore Yarn cache
+            # when lock file changes, use increasingly general patterns to restore cache
+            - yarn-cache-<< parameters.version >>-{{ .Branch }}-{{ checksum "yarn.lock" }}
+            - yarn-cache-<< parameters.version >>-{{ .Branch }}-
+            - yarn-cache-<< parameters.version >>-
+          name: Restore yarn cache
+
   cache-write:
+    parameters:
+      version:
+        description: Version of the cache to save
+        type: string
+        default: "v1"
     steps:
       - save_cache:
-          key: yarn-cache-{{ arch }}-{{checksum "yarn.lock" }}
-          name: Save Yarn cache
+          key: yarn-cache-<< parameters.version >>-{{ .Branch }}-{{checksum "yarn.lock" }}
+          name: Save yarn cache
           paths:
-            - ~/.cache
+            - ~/.cache/yarn
             - ./node_modules
+
   install:
     steps:
-      - run: "yarn install"
+      - run: "yarn install --frozen-lockfile"
